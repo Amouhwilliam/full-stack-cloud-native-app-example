@@ -88,6 +88,7 @@ services:
   redisinsight: # redis db visualization dashboard
     container_name: redis-insight-container
     image: redislabs/redisinsight
+    restart: always
     links:
       - redis
     depends_on:
@@ -102,6 +103,7 @@ services:
   traefik:
     container_name: traefik-container
     image: traefik:v2.5
+    restart: always
     command: --api.insecure=true --providers.docker
     ports:
       - "80:80"

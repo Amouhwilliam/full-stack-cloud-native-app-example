@@ -27,6 +27,10 @@ Route.get('/', async () => {
 
 Route.group(async () => {
 
+  Route.get('/', async () => {
+    return "Welcome to devices api !"
+  })
+
   Route.get('/devices',"DevicesController.getDevices")
 
   Route.get('/devices/:id',"DevicesController.getDevice").where('id', {
