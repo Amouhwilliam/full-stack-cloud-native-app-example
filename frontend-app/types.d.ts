@@ -1,0 +1,1 @@
+declare module '@devices-app/api-sdk'
