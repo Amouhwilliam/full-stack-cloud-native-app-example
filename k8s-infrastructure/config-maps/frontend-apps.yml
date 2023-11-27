@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-apps
+data:
+  main_app_api_url: "http://localhost:3333/api/v1"
+  realtime_app_api_url: "http://localhost:3333/api/v1/devices/all" #Rabbitmq-nodeport.default
+  realtime_app_ws_url: python-app-service.default #${python-app-nodeport.default} #"ws://localhost:8000/ws"

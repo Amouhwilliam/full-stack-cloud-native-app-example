@@ -1,0 +1,11 @@
+**/build
+**/dist
+**/node_modules
+.git
+Dockerfile
+.dockerignore
+.idea
+README.md
+docker-compose.yml
+**/.env
+**/.env.dev

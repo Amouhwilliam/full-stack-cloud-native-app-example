@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  build:
+    container_name: build-container
+    image: william97/devices-app-main_app:1.0
+    build:
+      dockerfile: Dockerfile
+    working_dir: /usr/src/app
+    #command: bash -c "ls -a frontend-app/"

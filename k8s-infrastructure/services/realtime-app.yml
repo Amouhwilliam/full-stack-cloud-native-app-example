@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: realtime-app-service
+  labels:
+    app: realtime-app
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5173
+    targetPort: rlt-app-svc
+  selector:
+    app: realtime-app

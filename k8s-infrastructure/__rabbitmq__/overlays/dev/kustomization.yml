@@ -1,0 +1,12 @@
+  
+
+resources:
+- namespace.yaml
+- ../../resources
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: rabbitmq-dev
+labels:
+- includeSelectors: true
+  pairs:
+    app: rabbitmq

@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  api:
+    image: node:lts-gallium
+    container_name: api-container
+    restart: always
+    working_dir: /app
+    env_file:
+      - .env
+    environment:
+      PG_HOST: ${PG_HOST}
+      PG_PORT: ${PG_PORT}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_DB_NAME: ${PG_DB_NAME}
+      DB_CONNECTION: ${DB_CONNECTION}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      RABBITMQ_HOSTNAME: ${RABBITMQ_HOSTNAME}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_PROTOCOL: ${RABBITMQ_PROTOCOL}
+    ports:
+      - ${PORT}:3333
+    links:
+      - postgres
+      - redis
+      - rabbitmq
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    volumes:
+      - ./:/app
+    command: bash -c "yarn && yarn dev" # install node modules and start adonis server
+
+  postgres:
+    container_name: postgres-container
+    image: postgres
+    restart: always
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./dockerConfig/postgres-dev-init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB_NAME}
+    ports:
+      - ${PG_PORT}:5432
+
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PWD}
+      PG_HOST: ${PG_HOST}
+      PG_PORT: ${PG_PORT}
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_DB_NAME: ${PG_DB_NAME}
+      DB_CONNECTION: ${DB_CONNECTION}
+    ports:
+      - 5050:80 #${PG_ADMIN_PORT}:80
+
+  redis:
+    container_name: redis-container
+    image: redis:alpine
+    restart: always
+    ports:
+      - ${REDIS_PORT}:6379
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - cache:/data
+
+  redisinsight: # redis db visualization dashboard
+    container_name: redis-insight-container
+    image: redislabs/redisinsight
+    restart: always
+    links:
+      - redis
+    depends_on:
+      - redis
+    ports:
+      - 8001:8001
+    volumes:
+      - redis-insight:/db
+  
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.8-management-alpine
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+
+volumes:
+  postgres:
+  cache:
+  redis-insight:
+  rabbitmq:
